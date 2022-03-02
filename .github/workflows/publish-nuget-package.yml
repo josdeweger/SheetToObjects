@@ -48,6 +48,6 @@ jobs:
       run: dotnet pack --configuration $BUILD_CONFIG /p:Version=${VERSION} --no-build --output .
       
     - name: Push
-      run: dotnet nuget push NuGet.Workflow.${VERSION}.nupkg --source https://nuget.pkg.github.com/acraven/index.json --api-key ${NUGET_API_KEY}
+      run: dotnet nuget push **\*.nupkg --source https://nuget.pkg.github.com/acraven/index.json --api-key ${NUGET_API_KEY}
       env:
         NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
