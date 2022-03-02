@@ -7,13 +7,17 @@ on:
   pull_request:
     branches:
     - dev
-    
+
+defaults:
+ run:
+  working-directory: ./src
+
 jobs:
   build:
 
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: 'src/SheetToObjects.sln'
+      SOLUTION: 'SheetToObjects.sln'
 
     runs-on: windows-latest
 
