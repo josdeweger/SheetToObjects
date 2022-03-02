@@ -1,0 +1,13 @@
+<Project>
+
+    <PropertyGroup>
+        <LangVersion>10</LangVersion>
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <Nullable>enable</Nullable>
+        <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+        <AnalysisLevel>latest</AnalysisLevel>
+        <Authors>Jos de Weger</Authors>
+        <RepositoryUrl>https://github.com/josdeweger/SheetToObjects</RepositoryUrl>
+    </PropertyGroup>
+
+</Project>

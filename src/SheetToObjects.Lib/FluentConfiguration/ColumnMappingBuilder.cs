@@ -16,7 +16,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
         private string _columnLetter;
         private string _propertyName;
         private string _format;
-        private object _defaultValue;
+        private object? _defaultValue;
         private bool _isRequiredInHeaderRow;
         private readonly List<IParsingRule> _parsingRules = new List<IParsingRule>();
         private readonly List<IRule> _rules = new List<IRule>();
@@ -52,7 +52,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
         /// <summary>
         /// Set a default value for non-nullable value types that are not required
         /// </summary>
-        public ColumnMappingBuilder<T> WithDefaultValue<TValue>(TValue defaultValue)
+        public ColumnMappingBuilder<T> WithDefaultValue<TValue>(TValue? defaultValue)
         {
             _defaultValue = defaultValue;
             return this;

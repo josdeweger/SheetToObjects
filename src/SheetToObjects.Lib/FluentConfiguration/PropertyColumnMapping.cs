@@ -14,7 +14,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
             string format, 
             List<IParsingRule> parsingRules, 
             List<IRule> rules, 
-            object defaultValue, 
+            object? defaultValue, 
             bool isRequiredInHeaderRow,
             Func<string, object> customValueParser) 
             : base(propertyName, format, parsingRules, rules, defaultValue, customValueParser)
