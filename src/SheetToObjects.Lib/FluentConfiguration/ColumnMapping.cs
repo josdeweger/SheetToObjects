@@ -13,7 +13,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
         public string Format { get; }
         public List<IParsingRule> ParsingRules { get; }
         public List<IRule> Rules { get; }
-        public object DefaultValue { get; }
+        public object? DefaultValue { get; }
         public readonly Func<string, object> CustomValueParser;
 
         protected ColumnMapping(
@@ -21,7 +21,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
             string format, 
             List<IParsingRule> parsingRules, 
             List<IRule> rules, 
-            object defaultValue,
+            object? defaultValue,
             Func<string, object> customValueParser)
         {
             CustomValueParser = customValueParser;
