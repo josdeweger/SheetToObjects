@@ -44,9 +44,6 @@ jobs:
     - name: Build
       run: dotnet build $SOLUTION --configuration $BUILD_CONFIG --no-restore
       
-    - name: Pack
-      run: dotnet pack --configuration $BUILD_CONFIG /p:Version=${VERSION} --no-build --output .
-      
     - name: Publish
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_API_KEY}}
 
