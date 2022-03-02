@@ -8,16 +8,12 @@ on:
     branches:
     - dev
 
-defaults:
- run:
-  working-directory: ./src
-
 jobs:
   build:
 
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: 'SheetToObjects.sln'
+      SOLUTION: '.\src\SheetToObjects.sln'
 
     runs-on: ubuntu-latest
 
