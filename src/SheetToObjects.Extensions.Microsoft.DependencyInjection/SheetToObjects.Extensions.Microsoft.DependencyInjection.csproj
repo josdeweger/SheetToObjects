@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="../Common.props" />
   <PropertyGroup>
-    <Summary>Extension to SheetToObjects (Sheet to object mapper for Google Sheets, Excel, csv), which makes it easy to add SheetToObjects to the Microsoft.Extensions.DependencyInjection services collection.</Summary>
-    <Description>Extension to SheetToObjects (Sheet to object mapper for Google Sheets, Excel, csv), which makes it easy to add SheetToObjects to the Microsoft.Extensions.DependencyInjection services collection.</Description>
-    <PackageProjectUrl>https://github.com/josdeweger/SheetToObjects</PackageProjectUrl>
-    <PackageLicenseUrl>https://github.com/josdeweger/SheetToObjects/blob/dev/LICENSE</PackageLicenseUrl>
-    <PackageTags>Google Sheets, Microsoft Excel, CSV, Comma Seperated File, mapping, objects, poco, configuration, validation, microsoft dependency injection</PackageTags>
+    <Summary>Extension to SheetToObjects (Sheet to object mapper for Google Sheets, Excel, csv), which makes it easy to add SheetToObjects to the Microsoft.Extensions.DependencyInjection services collection.</Summary>    
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <RepositoryUrl>https://github.com/josdeweger/SheetToObjects</RepositoryUrl>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <PackageReleaseNotes>No longer supporting .NET framework</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SheetToObjects.Lib\SheetToObjects.Lib.csproj" />
