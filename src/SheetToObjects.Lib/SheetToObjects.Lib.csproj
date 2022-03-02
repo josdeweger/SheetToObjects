@@ -2,7 +2,8 @@
   <Import Project="../Common.props" />
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
-    <IsPackable>false</IsPackable>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
