@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <Version>3.0.1</Version>
+    <Version>3.0.2</Version>
     <Description>SheetToObjects is a library which aims to provide developers with an easy solution to map sheets (Google Sheets, Microsoft Excel, csv) to a model/POCO.</Description>
     <PackageProjectUrl>https://github.com/josdeweger/SheetToObjects</PackageProjectUrl>
     <License>https://github.com/josdeweger/SheetToObjects/blob/dev/LICENSE</License>
