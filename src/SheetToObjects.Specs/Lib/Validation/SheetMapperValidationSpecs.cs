@@ -199,7 +199,8 @@ namespace SheetToObjects.Specs.Lib.Validation
         [Fact]
         public void GivenSheet_WhenMappingStringPropertyThatDoesNotSatisfyRegex_ItSetsValidationError()
         {
-            var columnName = "String";
+            var cellValue = "import1@mail";
+            var columnName = "StringRegexProperty";
 
             var sheetData = new SheetBuilder()
                 .AddHeaders(columnName)
@@ -207,17 +208,16 @@ namespace SheetToObjects.Specs.Lib.Validation
                     .AddCell(c => c
                         .WithColumnIndex(0)
                         .WithRowIndex(0)
-                        .WithValue("import1@mail")
+                        .WithValue(cellValue)
                         .Build())
                     .Build(0))
                 .Build();
 
-            var result = new SheetMapper()
-                .Map<TestModel>(sheetData);
+            var result = new SheetMapper().Map<TestModel>(sheetData);
 
             result.ValidationErrors.Should().HaveCount(1);
             result.ValidationErrors.Single().PropertyName.Should().Be("StringRegexProperty");
-            result.ValidationErrors.Single().CellValue.Should().Be(string.Empty);
+            result.ValidationErrors.Single().CellValue.Should().Be(cellValue);
         }
 
         [Fact]

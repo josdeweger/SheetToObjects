@@ -32,7 +32,7 @@ namespace SheetToObjects.Lib.Parsing
         public Result<object, string> Parse(Type type, string value, string format = "")
         {
             if (type.IsNull())
-                return Result.Fail<object, string>($"Can not parse value for unspecified type");
+                return Result.Failure<object, string>($"Can not parse value for unspecified type");
             
             if (type.IsEnum)
                 return new EnumValueParser(type).Parse(value);
@@ -40,7 +40,7 @@ namespace SheetToObjects.Lib.Parsing
             if(_parsers.TryGetValue(type, out var parser))
                 return parser(value, format);
 
-            return Result.Fail<object, string>($"Parser for '{type.Name}' not implemented");
+            return Result.Failure<object, string>($"Parser for '{type.Name}' not implemented");
         }
     }
 }

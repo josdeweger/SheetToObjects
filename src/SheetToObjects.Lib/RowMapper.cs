@@ -30,9 +30,9 @@ namespace SheetToObjects.Lib
             });
 
             if (rowValidationErrors.Any())
-                return Result.Fail<ParsedModel<T>, List<IValidationError>>(rowValidationErrors);
+                return Result.Failure<ParsedModel<T>, List<IValidationError>>(rowValidationErrors);
             
-            return Result.Ok<ParsedModel<T>, List<IValidationError>>(new ParsedModel<T>(obj, row.RowIndex));
+            return Result.Success<ParsedModel<T>, List<IValidationError>>(new ParsedModel<T>(obj, row.RowIndex));
         }
 
         private IEnumerable<IValidationError> MapRow<TModel>(
@@ -53,14 +53,14 @@ namespace SheetToObjects.Lib
                 return HandleEmptyCell(columnMapping, row.RowIndex, property.Name)
                     .OnValue(error => new List<IValidationError> { error })
                     .OnEmpty(() => new List<IValidationError>())
-                    .Unwrap();
+                    .GetValueOrDefault();
             }
 
             var validationErrors = new List<IValidationError>();
 
             _valueMapper
                 .Map(cell.Value.ToString(), property.PropertyType, row.RowIndex, columnMapping)
-                .OnSuccess(value =>
+                .Tap(value =>
                 {
                     if (value.ToString().IsNotNullOrEmpty())
                         property.SetValue(obj, value);

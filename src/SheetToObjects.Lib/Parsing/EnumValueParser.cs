@@ -19,13 +19,13 @@ namespace SheetToObjects.Lib.Parsing
             var errorMessage = $"Cannot parse value '{value}' to type '{_type?.Name}'";
 
             if (_type.IsNull())
-                return Result.Fail<object, string>(errorMessage);
+                return Result.Failure<object, string>(errorMessage);
 
             if (!_type.IsEnum)
-                return Result.Fail<object, string>(errorMessage);
+                return Result.Failure<object, string>(errorMessage);
 
             if (value.IsNull())
-                return Result.Fail<object, string>(errorMessage);
+                return Result.Failure<object, string>(errorMessage);
 
             try
             {
@@ -33,24 +33,24 @@ namespace SheetToObjects.Lib.Parsing
                 {
                     if (_type.IsEnumDefined(intValue))
                     {
-                        return Result.Ok<object, string>(Enum.ToObject(_type, intValue));
+                        return Result.Success<object, string>(Enum.ToObject(_type, intValue));
                     }
 
-                    return Result.Fail<object, string>(errorMessage);
+                    return Result.Failure<object, string>(errorMessage);
                 }
 
                 var enumValue = Enum.Parse(_type, value.Replace(" ", string.Empty), ignoreCase: true);
                 if (enumValue.IsNotNull())
                 {
-                    return Result.Ok<object, string>(enumValue);
+                    return Result.Success<object, string>(enumValue);
                 }
             }
             catch (Exception)
             {
-                return Result.Fail<object, string>(errorMessage);
+                return Result.Failure<object, string>(errorMessage);
             }
 
-            return Result.Fail<object, string>(errorMessage);
+            return Result.Failure<object, string>(errorMessage);
         }
     }
 }

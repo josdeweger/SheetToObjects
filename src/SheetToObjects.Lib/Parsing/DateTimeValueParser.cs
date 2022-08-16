@@ -20,11 +20,11 @@ namespace SheetToObjects.Lib.Parsing
             try
             {
                 var parsedDateTime = DateTime.ParseExact(value, _format, CultureInfo.InvariantCulture);
-                return Result.Ok<object, string>(parsedDateTime);
+                return Result.Success<object, string>(parsedDateTime);
             }
             catch (Exception)
             {
-                return Result.Fail<object, string>(errorMessage);
+                return Result.Failure<object, string>(errorMessage);
             }
         }
     }

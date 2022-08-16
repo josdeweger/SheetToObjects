@@ -16,12 +16,12 @@ namespace SheetToObjects.Lib.Validation
         public Result Validate(string value)
         {
             if(value.IsNullOrEmpty())
-                return Result.Fail("Value is required");
+                return Result.Failure("Value is required");
 
             if(!WhiteSpaceAllowed && value.IsNullOrWhiteSpace())
-                return Result.Fail("Value is required");
+                return Result.Failure("Value is required");
 
-            return Result.Ok();
+            return Result.Success();
         }
     }
 }

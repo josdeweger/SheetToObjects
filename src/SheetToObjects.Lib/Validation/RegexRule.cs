@@ -29,26 +29,26 @@ namespace SheetToObjects.Lib.Validation
                         if (typeof(TValue) == typeof(string))
                         {
                             var returnValue = (TValue)Convert.ChangeType(string.Empty, typeof(TValue));
-                            return Result.Ok<TValue, IValidationError>(returnValue);
+                            return Result.Success<TValue, IValidationError>(returnValue);
                         }
 
-                        return Result.Ok<TValue, IValidationError>(default(TValue));
+                        return Result.Success<TValue, IValidationError>(default(TValue));
                     }
 
-                    return Result.Ok<TValue, IValidationError>(value);
+                    return Result.Success<TValue, IValidationError>(value);
                 }
 
                 var validationError = RuleValidationError.ValueDoesNotMatchRegex(columnIndex, rowIndex, columnName,
                     propertyName, stringValue, _pattern);
 
-                return Result.Fail<TValue, IValidationError>(validationError);
+                return Result.Failure<TValue, IValidationError>(validationError);
             }
             catch (Exception)
             {
                 var validationError = RuleValidationError.CouldNotValidateValueWithPattern(columnIndex, rowIndex, columnName,
                     propertyName, _pattern);
 
-                return Result.Fail<TValue, IValidationError>(validationError);
+                return Result.Failure<TValue, IValidationError>(validationError);
             }
         }
     }

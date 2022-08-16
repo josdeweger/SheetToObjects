@@ -14,11 +14,11 @@ namespace SheetToObjects.Lib.Validation
                 if (allValuesInColumn.GroupBy(x => x).Any(g => g.Count() > 1))
                 {
                     var validationError = RuleValidationError.ColumnMustContainUniqueValues(columnIndex, columnName);
-                    return Result.Fail<List<object>, IValidationError>(validationError);
+                    return Result.Failure<List<object>, IValidationError>(validationError);
                 }
             }
 
-            return Result.Ok<List<object>, IValidationError>(allValuesInColumn);
+            return Result.Success<List<object>, IValidationError>(allValuesInColumn);
         }
     }
 }

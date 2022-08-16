@@ -17,11 +17,11 @@ namespace SheetToObjects.Lib.Parsing
             try
             {
                 var parsedValue = Convert.ChangeType(value, _type);
-                return Result.Ok<object, string>(parsedValue);
+                return Result.Success<object, string>(parsedValue);
             }
             catch (Exception)
             {
-                return Result.Fail<object, string>($"Cannot parse value '{value}' to type '{_type.Name}'");
+                return Result.Failure<object, string>($"Cannot parse value '{value}' to type '{_type.Name}'");
             }
         }
     }

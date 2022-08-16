@@ -18,10 +18,10 @@ namespace SheetToObjects.Lib.FluentConfiguration
             var sheetToConfigAttribute = type.GetCustomAttributes().OfType<SheetToObjectAttributeConfig>().FirstOrDefault();
             if (sheetToConfigAttribute.IsNotNull())
             {
-                return Result.Ok(CreateMappingConfigForType(type, sheetToConfigAttribute));
+                return Result.Success(CreateMappingConfigForType(type, sheetToConfigAttribute));
             }
 
-            return Result.Fail<MappingConfig>($"No SheetToObjectConfig attribute found on model of type {type}");
+            return Result.Failure<MappingConfig>($"No SheetToObjectConfig attribute found on model of type {type}");
         }
 
         private MappingConfig CreateMappingConfigForType(Type type, SheetToObjectAttributeConfig sheetToAttributeConfigAttribute)

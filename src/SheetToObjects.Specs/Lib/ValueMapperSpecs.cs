@@ -59,7 +59,7 @@ namespace SheetToObjects.Specs.Lib
         {
             var value = 50;
             var parsingStrategyProvider = new Mock<IProvideParsingStrategy>();
-            parsingStrategyProvider.Setup(v => v.Parse(typeof(int), value.ToString(), string.Empty)).Returns(Result.Ok<object, string>(value));
+            parsingStrategyProvider.Setup(v => v.Parse(typeof(int), value.ToString(), string.Empty)).Returns(Result.Success<object, string>(value));
 
             var mapper = new ValueMapper(parsingStrategyProvider.Object);
 
@@ -80,7 +80,7 @@ namespace SheetToObjects.Specs.Lib
         {
             var value = "foo";
             var parsingStrategyProvider = new Mock<IProvideParsingStrategy>();
-            parsingStrategyProvider.Setup(v => v.Parse(typeof(int), value.ToString(), string.Empty)).Returns(Result.Fail<object, string>("Parsing failed"));
+            parsingStrategyProvider.Setup(v => v.Parse(typeof(int), value.ToString(), string.Empty)).Returns(Result.Failure<object, string>("Parsing failed"));
 
             var mapper = new ValueMapper(parsingStrategyProvider.Object);
 

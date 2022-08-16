@@ -23,20 +23,20 @@ namespace SheetToObjects.Lib.Validation
 
                 if (_customRuleFunc(typedValue))
                 {
-                    return Result.Ok<object, IValidationError>(value);
+                    return Result.Success<object, IValidationError>(value);
                 }
 
                 var validationError = new RuleValidationError(columnIndex, rowIndex, _validationMessage, columnName,
                     typedValue.ToString(), propertyName);
 
-                return Result.Fail<object, IValidationError>(validationError);
+                return Result.Failure<object, IValidationError>(validationError);
             }
             catch (Exception)
             {
                 var validationError =
                     RuleValidationError.CouldNotValidateValue(columnIndex, rowIndex, columnName, propertyName);
 
-                return Result.Fail<object, IValidationError>(validationError);
+                return Result.Failure<object, IValidationError>(validationError);
             }
         }
     }

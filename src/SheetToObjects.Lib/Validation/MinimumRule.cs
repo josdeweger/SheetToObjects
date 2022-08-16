@@ -20,10 +20,10 @@ namespace SheetToObjects.Lib.Validation
             if (castValue.CompareTo(_minimumValue) <= 0)
             {
                 var validationError = RuleValidationError.HasToHaveMinimumValueOf(columnIndex, rowIndex, columnName, propertyName, _minimumValue);
-                return Result.Fail<object, IValidationError>(validationError);
+                return Result.Failure<object, IValidationError>(validationError);
             }
 
-            return Result.Ok<object, IValidationError>(_minimumValue);
+            return Result.Success<object, IValidationError>(_minimumValue);
         }
     }
 }

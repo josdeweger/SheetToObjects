@@ -102,7 +102,7 @@ namespace SheetToObjects.Lib
             dataRows.ForEach(row =>
             {
                 _rowMapper.Map<T>(row, mappingConfig)
-                    .OnSuccess(result => parsedModels.Add(result))
+                    .Tap(result => parsedModels.Add(result))
                     .OnFailure(rowValidationErrors => validationErrors.AddRange(rowValidationErrors));
             });
         }

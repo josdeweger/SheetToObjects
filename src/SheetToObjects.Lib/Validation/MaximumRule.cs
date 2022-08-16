@@ -20,10 +20,10 @@ namespace SheetToObjects.Lib.Validation
             if (castValue.CompareTo(_maximumValue) > 0)
             {
                 var validationError = RuleValidationError.CanHaveMaximumValueOf(columnIndex, rowIndex, columnName, propertyName, _maximumValue);
-                return Result.Fail<object, IValidationError>(validationError);
+                return Result.Failure<object, IValidationError>(validationError);
             }
 
-            return Result.Ok<object, IValidationError>(_maximumValue);
+            return Result.Success<object, IValidationError>(_maximumValue);
         }
     }
 }

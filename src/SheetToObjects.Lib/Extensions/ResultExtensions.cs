@@ -9,18 +9,18 @@ namespace SheetToObjects.Lib.Extensions
             where TError : class
         {
             if (result.IsSuccess)
-                return Result.Ok<TResult, TError>(func(result.Value));
+                return Result.Success<TResult, TError>(func(result.Value));
 
-            return Result.Fail<TResult, TError>(result.Error);
+            return Result.Failure<TResult, TError>(result.Error);
         }
 
         public static Result<TResult, TError> OnValidationFailure<TResult, TError>(this Result<TResult, string> result, Func<string, TError> func) 
             where TError : class
         {
             if (result.IsFailure)
-                return Result.Fail<TResult, TError>(func(result.Error));
+                return Result.Failure<TResult, TError>(func(result.Error));
 
-            return Result.Ok<TResult, TError>(result.Value);
+            return Result.Success<TResult, TError>(result.Value);
         }
     }
 }

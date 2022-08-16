@@ -29,7 +29,8 @@ namespace SheetToObjects.Lib
                 try
                 {
                     var parsedValue = columnMapping.CustomValueParser(value);
-                    return Result.Ok<object, IValidationError>(parsedValue);
+                    
+                    return Result.Success<object, IValidationError>(parsedValue);
                 }
                 catch (Exception)
                 {
@@ -39,7 +40,7 @@ namespace SheetToObjects.Lib
                         columnMapping.DisplayName,
                         columnMapping.PropertyName);
 
-                    return Result.Fail<object, IValidationError>(parsingValidationError);
+                    return Result.Failure<object, IValidationError>(parsingValidationError);
                 }
             }
 
@@ -63,10 +64,10 @@ namespace SheetToObjects.Lib
                     columnMapping.DisplayName,
                     columnMapping.PropertyName);
 
-                return Result.Fail<object, IValidationError>(cellValueRequiredError);
+                return Result.Failure<object, IValidationError>(cellValueRequiredError);
             }
 
-            return Result.Ok<object, IValidationError>(columnMapping.DefaultValue ?? string.Empty);
+            return Result.Success<object, IValidationError>(columnMapping.DefaultValue ?? string.Empty);
         }
     }
 }
