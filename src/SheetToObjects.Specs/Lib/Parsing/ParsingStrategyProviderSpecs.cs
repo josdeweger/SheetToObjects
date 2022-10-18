@@ -187,7 +187,7 @@ namespace SheetToObjects.Specs.Lib.Parsing
 
             var result = _cellValueParser.Parse(typeof(Guid), value);
 
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccess.Should().BeTrue();
         }
         
         [Fact]
@@ -197,7 +197,7 @@ namespace SheetToObjects.Specs.Lib.Parsing
 
             var result = _cellValueParser.Parse(typeof(Guid?), value);
 
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccess.Should().BeTrue();
         }
         
         [Fact]
@@ -207,7 +207,7 @@ namespace SheetToObjects.Specs.Lib.Parsing
 
             var result = _cellValueParser.Parse(typeof(Guid?), value);
 
-            result.IsSuccess.Should().BeFalse();
+            result.IsSuccess.Should().BeTrue();
         }
     }
 }
