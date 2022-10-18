@@ -24,6 +24,8 @@ namespace SheetToObjects.Lib.Parsing
                 {typeof(decimal?), (value, format) => new ObjectValueParser(typeof(decimal?)).Parse(value)},
                 {typeof(bool), (value, format) => new ObjectValueParser(typeof(bool)).Parse(value)},
                 {typeof(bool?), (value, format) => new ObjectValueParser(typeof(bool?)).Parse(value)},
+                {typeof(Guid), (value, format) => new GuidValueParser(typeof(Guid)).Parse(value)},
+                {typeof(Guid?), (value, format) => new GuidValueParser(typeof(Guid?)).Parse(value)},
                 {typeof(DateTime), (value, format) => new DateTimeValueParser(format).Parse(value)},
                 {typeof(DateTime?), (value, format) => new DateTimeValueParser(format).Parse(value)}
             };

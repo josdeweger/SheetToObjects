@@ -19,11 +19,12 @@ namespace SheetToObjects.Specs.Lib
         private readonly DateTime _dateTimeValue = new DateTime(2018, 5, 30);
         private readonly EnumModel _enumValue = EnumModel.Second;
         private readonly decimal _decimalValue = 5.123m;
+        private readonly Guid _guidValue = new();
 
         public SheetMapperSpecs()
         {
             _sheetData = new SheetBuilder()
-                .AddHeaders("Double", "Integer", "Boolean", "Enumeration", "String", "DateTime", "Decimal")
+                .AddHeaders("Double", "Integer", "Boolean", "Enumeration", "String", "DateTime", "Decimal", "Guid")
                 .AddRow(r => r
                     .AddCell(c => c.WithColumnIndex(0).WithRowIndex(1).WithValue(_doubleValue.ToString()).Build())
                     .AddCell(c => c.WithColumnIndex(1).WithRowIndex(1).WithValue(_intValue.ToString()).Build())
@@ -32,6 +33,7 @@ namespace SheetToObjects.Specs.Lib
                     .AddCell(c => c.WithColumnIndex(4).WithRowIndex(1).WithValue(_stringValue.ToString()).Build())
                     .AddCell(c => c.WithColumnIndex(5).WithRowIndex(1).WithValue(_dateTimeValue.ToString("yyyy-MM-dd")).Build())
                     .AddCell(c => c.WithColumnIndex(6).WithRowIndex(1).WithValue(_decimalValue.ToString()).Build())
+                    .AddCell(c => c.WithColumnIndex(7).WithRowIndex(1).WithValue(_guidValue.ToString()).Build())
                     .Build(0))
                 .Build();
         }
@@ -112,6 +114,44 @@ namespace SheetToObjects.Specs.Lib
 
             result.ParsedModels.Should().HaveCount(1);
             result.ParsedModels.Single().Value.DateTimeProperty.Should().Be(_dateTimeValue);
+        }
+        
+        [Fact]
+        public void GivenSheet_WhenMappingModelGuidProperty_ItSetsPropertyOnModel()
+        {
+            var result = new SheetMapper()
+                .AddConfigFor<TestModel>(cfg => cfg
+                    .HasHeaders()
+                    .MapColumn(column => column
+                        .WithHeader("Guid")
+                        .IsRequired()
+                        .MapTo(t => t.GuidProperty)))
+                .Map<TestModel>(_sheetData);
+
+            result.ParsedModels.Should().HaveCount(1);
+            result.ParsedModels.Single().Value.GuidProperty.Should().Be(_guidValue);
+        }
+        
+        [Fact]
+        public void GivenSheet_WhenMappingModelNullableGuidProperty_ItSetsPropertyOnModel()
+        {
+            var sheetData = new SheetBuilder()
+                .AddHeaders("Guid")
+                .AddRow(r => r
+                    .AddCell(c => c.WithColumnIndex(0).WithRowIndex(0).WithValue("").Build())
+                    .Build(1))
+                .Build();
+            
+            var result = new SheetMapper()
+                .AddConfigFor<TestModel>(cfg => cfg
+                    .HasHeaders()
+                    .MapColumn(column => column
+                        .WithHeader("Guid")
+                        .MapTo(t => t.NullableGuidProperty)))
+                .Map<TestModel>(sheetData);
+
+            result.ParsedModels.Should().HaveCount(1);
+            result.ParsedModels.Single().Value.NullableGuidProperty.Should().BeNull();
         }
 
         [Fact]
