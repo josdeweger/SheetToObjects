@@ -159,5 +159,55 @@ namespace SheetToObjects.Specs.Lib.Parsing
 
             result.IsSuccess.Should().BeFalse();
         }
+        
+        [Fact]
+        public void GivenParsingGuid_WhenValueIsEmpty_ResultIsInvalid()
+        {
+            var value = string.Empty;
+
+            var result = _cellValueParser.Parse(typeof(Guid), value);
+
+            result.IsSuccess.Should().BeFalse();
+        }
+        
+        [Fact]
+        public void GivenParsingGuid_WhenValueIsInvalidGuid_ResultIsInvalid()
+        {
+            var value = "12345";
+
+            var result = _cellValueParser.Parse(typeof(Guid), value);
+
+            result.IsSuccess.Should().BeFalse();
+        }
+        
+        [Fact]
+        public void GivenParsingGuid_WhenValueIsValidGuid_ResultIsValid()
+        {
+            var value = Guid.NewGuid().ToString();
+
+            var result = _cellValueParser.Parse(typeof(Guid), value);
+
+            result.IsSuccess.Should().BeTrue();
+        }
+        
+        [Fact]
+        public void GivenParsingNullableGuid_WhenValueIsEmpty_ResultIsValid()
+        {
+            var value = String.Empty;
+
+            var result = _cellValueParser.Parse(typeof(Guid?), value);
+
+            result.IsSuccess.Should().BeTrue();
+        }
+        
+        [Fact]
+        public void GivenParsingNullableGuid_WhenValueIsValidGuid_ResultIsValid()
+        {
+            var value = Guid.NewGuid().ToString();
+
+            var result = _cellValueParser.Parse(typeof(Guid?), value);
+
+            result.IsSuccess.Should().BeTrue();
+        }
     }
 }

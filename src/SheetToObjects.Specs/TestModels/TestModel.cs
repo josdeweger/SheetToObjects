@@ -27,6 +27,10 @@ namespace SheetToObjects.Specs.TestModels
 
         public DateTime DateTimeProperty { get; set; }
 
+        public Guid GuidProperty { get; set; }
+
+        public Guid? NullableGuidProperty { get; set; }
+
         [IgnorePropertyMapping]
         public string PropertyWithBody => string.Empty;
 

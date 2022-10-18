@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using CSharpFunctionalExtensions;
+using SheetToObjects.Core;
 
 namespace SheetToObjects.Lib.Parsing
 {
@@ -25,6 +26,31 @@ namespace SheetToObjects.Lib.Parsing
             catch (Exception)
             {
                 return Result.Failure<object, string>(errorMessage);
+            }
+        }
+    }
+    
+    internal class GuidValueParser : IValueParsingStrategy
+    {
+        private readonly bool _isNullable;
+
+        public GuidValueParser(Type type)
+        {
+            _isNullable = type.IsNullable();
+        }
+        
+        public Result<object, string> Parse(string value)
+        {
+            try
+            {
+                if (_isNullable && string.IsNullOrEmpty(value))
+                    return Result.Success<object, string>(default!);
+                
+                return Result.Success<object, string>(Guid.Parse(value));
+            }
+            catch (Exception)
+            {
+                return Result.Failure<object, string>($"Could not parse value {value} to Guid");
             }
         }
     }
