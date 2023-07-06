@@ -91,6 +91,17 @@ namespace SheetToObjects.Lib
             );
         }
 
+        public List<IValidationError>? MapHeadersToIndex<T>(Row firstRow)
+        {
+            var mappingConfig = GetMappingConfig<T>();
+
+            if (!mappingConfig.HasHeaders)
+                return null;
+
+            var headerValidationErrors = HandleHeaderRow(firstRow, mappingConfig);
+            return headerValidationErrors;
+        }
+
         public MappingRowResult<T> MapRow<T>(Row row)
             where T : new()
         {
@@ -130,7 +141,7 @@ namespace SheetToObjects.Lib
                     .TrueForAll(c => c.Value.IsNull() ||
                                      c.Value is string s && s.IsNullOrEmpty()));
 
-            if (firstEmptyRow.IsNotNull())
+            if (firstEmptyRow is not null)
                 dataRows = dataRows.Where(r => r.RowIndex < firstEmptyRow.RowIndex).ToList();
 
             return dataRows;

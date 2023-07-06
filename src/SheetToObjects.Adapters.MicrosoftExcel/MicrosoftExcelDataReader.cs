@@ -10,19 +10,18 @@ using System.Reflection;
 
 namespace SheetToObjects.Adapters.MicrosoftExcel;
 
-public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>, IEnumerator<ReaderObject<T>>, IEnumerator
+public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>, IDisposable
     where T : new()
 {
-    private int _rowNumber = -1;
-    private ReaderObject<T>? _current;
+    private int _rowNumber;
     private bool _disposedValue;
 
     private readonly IConvertDataToRow<List<string>> _excelRowConverter;
     private readonly ExcelPackage _excelPackage;
     private readonly ExcelWorksheet _workSheet;
     private readonly ExcelRange _range;
-    private readonly bool _stopReadingOnEmptyRow;
     private readonly IMapSheetToObjects _mapper;
+    private readonly Enumerator _enumerator;
 
     static MicrosoftExcelDataReader()
     {
@@ -30,18 +29,15 @@ public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>,
         licenseField.SetValue(null, true);
     }
 
-    object IEnumerator.Current => ((IEnumerator<ReaderObject<T>>)this).Current;
-
     public int Count => _workSheet.Rows.Count();
     public ExcelPackage ExcelPackage => _excelPackage;
-
-    ReaderObject<T> IEnumerator<ReaderObject<T>>.Current => GetCurrent();
+    public ExcelWorksheet Worksheet => _workSheet;
 
     internal MicrosoftExcelDataReader(
         ExcelPackage excelPackage,
         string sheetName,
         ExcelRange range,
-        Func<MappingConfigBuilder<T>, MappingConfigBuilder<T>> mappingConfigFunc,
+        IMapSheetToObjects mapper,
         IConvertDataToRow<List<string>> excelRowConverter,
         bool stopReadingOnEmptyRow)
     {
@@ -49,9 +45,11 @@ public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>,
         _workSheet = GetSheetFromWorkBook(excelPackage.Workbook, sheetName);
         _excelRowConverter = excelRowConverter;
         _range = range;
-        _stopReadingOnEmptyRow = stopReadingOnEmptyRow;
 
-        _mapper = new SheetMapper().AddConfigFor(mappingConfigFunc);
+        _mapper = mapper;
+
+        _rowNumber = _range.From.RowNumber - 1;
+        _enumerator = new(_workSheet, range, excelRowConverter, mapper, stopReadingOnEmptyRow);
     }
 
     public static MicrosoftExcelDataReader<T> CreateReader(
@@ -63,17 +61,30 @@ public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>,
     {
         MicrosoftExcelToRowConverter rowConverter = new();
         ExcelPackage excelPackage = new(stream);
-        ExcelWorkbook workBook = excelPackage.Workbook;
-        ExcelWorksheet workSheet = GetSheetFromWorkBook(workBook, sheetName);
+        IMapSheetToObjects mapper = new SheetMapper().AddConfigFor(mappingConfigFunc);
 
-        return new MicrosoftExcelDataReader<T>(excelPackage, sheetName, range, mappingConfigFunc, rowConverter, stopReadingOnEmptyRow);
+        return new MicrosoftExcelDataReader<T>(excelPackage, sheetName, range, mapper, rowConverter, stopReadingOnEmptyRow);
+    }
+
+    public static MicrosoftExcelDataReader<T> CreateReader(
+        Stream stream,
+        string sheetName,
+        ExcelRange range,
+        SheetToObjectConfig sheetToObjectConfig,
+        bool stopReadingOnEmptyRow = false)
+    {
+        MicrosoftExcelToRowConverter rowConverter = new();
+        ExcelPackage excelPackage = new(stream);
+        IMapSheetToObjects mapper = new SheetMapper().AddSheetToObjectConfig(sheetToObjectConfig);
+
+        return new MicrosoftExcelDataReader<T>(excelPackage, sheetName, range, mapper, rowConverter, stopReadingOnEmptyRow);
     }
 
     private static ExcelWorksheet GetSheetFromWorkBook(ExcelWorkbook excelWorkbook, string sheetName)
     {
         var normalizedSheetName = sheetName.Replace(" ", "").ToLowerInvariant();
 
-        for (var i = 1; i <= excelWorkbook.Worksheets.Count; i++)
+        for (var i = 0; i < excelWorkbook.Worksheets.Count; i++)
         {
             if (excelWorkbook.Worksheets[i].Name.Replace(" ", "").ToLowerInvariant().Equals(normalizedSheetName))
             {
@@ -86,62 +97,23 @@ public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>,
 
     public IEnumerator<ReaderObject<T>> GetEnumerator()
     {
-        return this;
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return this;
-    }
-
-    public bool MoveNext()
-    {
-        _rowNumber++;
-
-        if (_rowNumber >= _range.To.RowNumber)
-            return false;
-
-        if (!_stopReadingOnEmptyRow)
-            return true;
-
-        for (var columnNumber = _range.From.ColumnNumber; columnNumber <= _range.To.ColumnNumber; columnNumber++)
-        {
-            string item = _workSheet.Cells[_rowNumber, columnNumber].Text;
-            if (!string.IsNullOrEmpty(item))
-                return true;
-        }
-
-        return false;
-    }
-
-    public void Reset()
-    {
-        _rowNumber = -1;
-        _current = null;
-    }
-
-    private ReaderObject<T> GetCurrent()
-    {
-        if (_current is not null)
-            return _current;
-
         List<string> rowData = new();
 
         for (var columnNumber = _range.From.ColumnNumber; columnNumber <= _range.To.ColumnNumber; columnNumber++)
         {
-            rowData.Add(_workSheet.Cells[_rowNumber, columnNumber].Text);
+            var excelRange = _workSheet.Cells[_rowNumber, columnNumber];
+            rowData.Add(excelRange.Text);
         }
 
         Row row = _excelRowConverter.ConvertRow(rowData, _rowNumber);
-        MappingRowResult<T> mappingRowResult = _mapper.MapRow<T>(row);
+        _mapper.MapHeadersToIndex<T>(row);
 
-        _current = new ReaderObject<T>()
-        {
-            Row = _workSheet.Row(_rowNumber),
-            MappingRowResult = mappingRowResult
-        };
+        return _enumerator;
+    }
 
-        return _current;
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return ((IEnumerable<ReaderObject<T>>)this).GetEnumerator();
     }
 
     protected virtual void Dispose(bool disposing)
@@ -165,5 +137,88 @@ public class MicrosoftExcelDataReader<T> : IReadOnlyCollection<ReaderObject<T>>,
         // Не изменяйте этот код. Разместите код очистки в методе "Dispose(bool disposing)".
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    internal struct Enumerator : IEnumerator<ReaderObject<T>>, IEnumerator
+    {
+        private readonly ExcelWorksheet _workSheet;
+        private readonly ExcelRange _range;
+        private readonly bool _stopReadingOnEmptyRow;
+        private ReaderObject<T>? _current;
+        private readonly IConvertDataToRow<List<string>> _excelRowConverter;
+        private readonly IMapSheetToObjects _mapper;
+        private int _rowNumber;
+
+        public Enumerator(ExcelWorksheet workSheet, ExcelRange range, IConvertDataToRow<List<string>> excelRowConverter, IMapSheetToObjects mapper, bool stopReadingOnEmptyRow)
+        {
+            _workSheet = workSheet;
+            _range = range;
+            _excelRowConverter = excelRowConverter;
+            _mapper = mapper;
+            _stopReadingOnEmptyRow = stopReadingOnEmptyRow;
+
+            _rowNumber = _range.From.RowNumber - 1;
+        }
+
+        public ReaderObject<T> Current => GetCurrent();
+
+        object IEnumerator.Current => ((IEnumerator<ReaderObject<T>>)this).Current;
+
+        public void Dispose()
+        {
+            _rowNumber = -1;
+            _current = null;
+        }
+
+        public bool MoveNext()
+        {
+            _current = null;
+            _rowNumber++;
+
+            if (_rowNumber > _range.To.RowNumber)
+                return false;
+
+            if (!_stopReadingOnEmptyRow)
+                return true;
+
+            for (var columnNumber = _range.From.ColumnNumber; columnNumber <= _range.To.ColumnNumber; columnNumber++)
+            {
+                string item = _workSheet.Cells[_rowNumber, columnNumber].Text;
+                if (!string.IsNullOrEmpty(item))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private ReaderObject<T> GetCurrent()
+        {
+            if (_current is not null)
+                return _current;
+
+            List<string> rowData = new();
+
+            for (var columnNumber = _range.From.ColumnNumber; columnNumber <= _range.To.ColumnNumber; columnNumber++)
+            {
+                var excelRange = _workSheet.Cells[_rowNumber, columnNumber];
+                rowData.Add(excelRange.Text);
+            }
+
+            Row row = _excelRowConverter.ConvertRow(rowData, _rowNumber);
+            MappingRowResult<T> mappingRowResult = _mapper.MapRow<T>(row);
+
+            _current = new ReaderObject<T>()
+            {
+                Row = _workSheet.Row(_rowNumber),
+                MappingRowResult = mappingRowResult
+            };
+
+            return _current;
+        }
+
+        public void Reset()
+        {
+            Dispose();
+        }
     }
 }

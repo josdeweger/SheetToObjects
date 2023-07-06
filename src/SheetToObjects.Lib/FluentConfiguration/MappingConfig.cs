@@ -19,8 +19,8 @@ namespace SheetToObjects.Lib.FluentConfiguration
         }
 
         public List<ColumnMapping> ColumnMappings = new List<ColumnMapping>();
-        
-        public ColumnMapping GetColumnMappingByPropertyName(string propertyName)
+
+        public ColumnMapping? GetColumnMappingByPropertyName(string propertyName)
         {
             return ColumnMappings.FirstOrDefault(m =>
                 m.PropertyName.Equals(propertyName, StringComparison.InvariantCultureIgnoreCase));

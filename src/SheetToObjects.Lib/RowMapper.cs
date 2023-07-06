@@ -41,14 +41,14 @@ namespace SheetToObjects.Lib
             PropertyInfo property,
             TModel obj) where TModel : new()
         {
-            var columnMapping = mappingConfig.GetColumnMappingByPropertyName(property.Name);
+            ColumnMapping? columnMapping = mappingConfig.GetColumnMappingByPropertyName(property.Name);
 
-            if (columnMapping.IsNull())
+            if (columnMapping is null)
                 return new List<IValidationError>();
 
-            var cell = row.GetCellByColumnIndex(columnMapping.ColumnIndex);
+            Cell? cell = row.GetCellByColumnIndex(columnMapping.ColumnIndex);
 
-            if (cell == null)
+            if (cell is null)
             {
                 return HandleEmptyCell(columnMapping, row.RowIndex, property.Name)
                     .OnValue(error => new List<IValidationError> { error })
@@ -65,7 +65,7 @@ namespace SheetToObjects.Lib
                     if (value.ToString().IsNotNullOrEmpty())
                         property.SetValue(obj, value);
                 })
-                .OnFailure(validationError => { validationErrors.Add(validationError); });
+                .TapError(validationErrors.Add);
 
             return validationErrors;
         }

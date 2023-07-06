@@ -17,7 +17,7 @@ internal class MicrosoftExcelDataReaderOld<T> : IDisposable
 
     static MicrosoftExcelDataReaderOld()
     {
-        FieldInfo licenseField = typeof(ExcelPackage).GetField("_licenseSet", BindingFlags.NonPublic | BindingFlags.Static);
+        FieldInfo licenseField = typeof(ExcelPackage).GetField("_licenseSet", BindingFlags.NonPublic | BindingFlags.Static)!;
         licenseField.SetValue(null, true);
     }
 
