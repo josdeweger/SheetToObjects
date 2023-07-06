@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Summary>Microsoft Excel adapter for the SheetToObjects library.</Summary>    
 	<GeneratePackageOnBuild>true</GeneratePackageOnBuild>	
-	<TargetFramework>netstandard2.1</TargetFramework>
+	<TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="EPPlus" Version="6.2.6" />

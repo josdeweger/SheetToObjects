@@ -1,16 +1,16 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SheetToObjects.Core;
 using SheetToObjects.Lib.FluentConfiguration;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace SheetToObjects.Lib.Validation
 {
     internal class ModelValidator : IValidateModels
     {
         public ValidationResult<ParsedModel<TModel>> Validate<TModel>(
-            List<ParsedModel<TModel>> parsedModels, 
+            List<ParsedModel<TModel>> parsedModels,
             List<ColumnMapping> columnMappings)
             where TModel : new()
         {
@@ -25,9 +25,26 @@ namespace SheetToObjects.Lib.Validation
             return new ValidationResult<ParsedModel<TModel>>(validatedModels, validationErrors);
         }
 
+        public ValidationResult<ParsedModel<TModel>> ValidateRow<TModel>(
+            ParsedModel<TModel> parsedModels,
+            ColumnMapping columnMappings)
+            where TModel : new()
+        {
+            throw new System.Exception();
+            //var validatedModels = new List<ParsedModel<TModel>>();
+            //var validationErrors = new List<IValidationError>();
+            //var properties = typeof(TModel).GetProperties();
+
+            //validationErrors.AddRange(ValidatePropertyRules(parsedModels, columnMappings, properties, validatedModels));
+
+            //validationErrors.AddRange(ValidateColumnRules(parsedModels, columnMappings, properties));
+
+            //return new ValidationResult<ParsedModel<TModel>>(validatedModels, validationErrors);
+        }
+
         private static List<IValidationError> ValidatePropertyRules<TModel>(
-            List<ParsedModel<TModel>> parsedModels, 
-            List<ColumnMapping> columnMappings, 
+            List<ParsedModel<TModel>> parsedModels,
+            List<ColumnMapping> columnMappings,
             PropertyInfo[] properties,
             List<ParsedModel<TModel>> validatedModels) where TModel : new()
         {
@@ -84,9 +101,9 @@ namespace SheetToObjects.Lib.Validation
         }
 
         private static List<IValidationError> ValidateRules<TModel>(
-            PropertyInfo property, 
-            ParsedModel<TModel> parsedModel, 
-            ColumnMapping columnMapping) 
+            PropertyInfo property,
+            ParsedModel<TModel> parsedModel,
+            ColumnMapping columnMapping)
             where TModel : new()
         {
             var modelValidationErrors = new List<IValidationError>();
@@ -120,7 +137,7 @@ namespace SheetToObjects.Lib.Validation
             return columnMapping.Rules
                 .Where(r => r.GetType().GetInterfaces().Contains(typeof(TRule)))
                 .Select(r => r as TRule)
-                .ToList();
+                .ToList()!;
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using SheetToObjects.Lib.Validation;
+using System.Collections.Generic;
 using System.Linq;
-using SheetToObjects.Lib.Validation;
 
 namespace SheetToObjects.Lib
 {
@@ -19,7 +19,7 @@ namespace SheetToObjects.Lib
             ValidationErrors = validationErrors;
         }
 
-        public static MappingResult<T> Create(List<ParsedModel<T>> parsedModels,List<IValidationError> validationErrors)
+        public static MappingResult<T> Create(List<ParsedModel<T>> parsedModels, List<IValidationError> validationErrors)
         {
             return new MappingResult<T>(parsedModels, validationErrors);
         }

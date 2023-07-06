@@ -1,11 +1,11 @@
-﻿using System;
+﻿using SheetToObjects.Core;
+using SheetToObjects.Lib.Exceptions;
+using SheetToObjects.Lib.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using SheetToObjects.Core;
-using SheetToObjects.Lib.Exceptions;
-using SheetToObjects.Lib.Validation;
 
 namespace SheetToObjects.Lib.FluentConfiguration
 {
@@ -18,8 +18,8 @@ namespace SheetToObjects.Lib.FluentConfiguration
         private string _format;
         private object? _defaultValue;
         private bool _isRequiredInHeaderRow;
-        private readonly List<IParsingRule> _parsingRules = new List<IParsingRule>();
-        private readonly List<IRule> _rules = new List<IRule>();
+        private readonly List<IParsingRule> _parsingRules = new();
+        private readonly List<IRule> _rules = new();
         private Func<string, object> _customValueParser;
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
         /// </summary>
         public ColumnMappingBuilder<T> WithColumnLetter(string columnLetter)
         {
-            _columnLetter = columnLetter; 
+            _columnLetter = columnLetter;
             return this;
         }
 
@@ -116,12 +116,12 @@ namespace SheetToObjects.Lib.FluentConfiguration
             var modelType = typeof(T);
             var propertyType = typeof(TProperty);
 
-            if (!(propertyLambda.Body is MemberExpression member))
+            if (propertyLambda.Body is not MemberExpression member)
                 throw new ArgumentException($"Expression '{propertyLambda}' refers to a method, not a property.");
 
             var propertyInfo = member.Member as PropertyInfo;
 
-            if (propertyInfo == null)
+            if (propertyInfo is null)
                 throw new ArgumentException($"Expression '{propertyLambda}' refers to a field, not a property.");
 
             if (modelType != propertyInfo.ReflectedType && !modelType.IsSubclassOf(propertyInfo.ReflectedType))
@@ -137,7 +137,7 @@ namespace SheetToObjects.Lib.FluentConfiguration
                 throw new MappingConfigurationException(
                     $"Non-nullable property '{propertyInfo.Name}' is not required and therefor needs a default value.");
             }
-            
+
             return MapTo(propertyInfo);
         }
 
@@ -146,19 +146,19 @@ namespace SheetToObjects.Lib.FluentConfiguration
         /// </summary>
         public ColumnMapping MapTo(PropertyInfo property)
         {
-            if(property.IsNull())
+            if (property.IsNull())
                 throw new ArgumentNullException($"Property is null");
-            
+
             _propertyName = property.Name;
 
-            if(_header.IsNotNullOrWhiteSpace())
-                return new NameColumnMapping(_header, _propertyName, _format, _parsingRules, _rules, _defaultValue,_isRequiredInHeaderRow, _customValueParser);
-            if(_columnLetter.IsNotNullOrWhiteSpace())
+            if (_header.IsNotNullOrWhiteSpace())
+                return new NameColumnMapping(_header, _propertyName, _format, _parsingRules, _rules, _defaultValue, _isRequiredInHeaderRow, _customValueParser);
+            if (_columnLetter.IsNotNullOrWhiteSpace())
                 return new LetterColumnMapping(_columnLetter, _propertyName, _format, _parsingRules, _rules, _defaultValue, _customValueParser);
-            if(_columnIndex >= 0)
+            if (_columnIndex >= 0)
                 return new IndexColumnMapping(_columnIndex, _propertyName, _format, _parsingRules, _rules, _defaultValue, _customValueParser);
 
-            return new PropertyColumnMapping(_propertyName, _format, _parsingRules, _rules, _defaultValue,_isRequiredInHeaderRow, _customValueParser);
+            return new PropertyColumnMapping(_propertyName, _format, _parsingRules, _rules, _defaultValue, _isRequiredInHeaderRow, _customValueParser);
         }
     }
 }

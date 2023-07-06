@@ -1,9 +1,9 @@
+using FluentAssertions;
+using SheetToObjects.Adapters.MicrosoftExcel;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using FluentAssertions;
-using SheetToObjects.Adapters.MicrosoftExcel;
 using Xunit;
 
 namespace SheetToObjects.Specs.Adapters
@@ -17,7 +17,7 @@ namespace SheetToObjects.Specs.Adapters
         {
             var base64EncodedCsv = "some invalid base64encoded string";
 
-            var provider = new SheetProvider(new ExcelAdapter());
+            var provider = new SheetProvider(new MicrosoftExcelToSheetConverter());
             var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("A", 2));
 
             Action result = () => provider.GetFromBase64Encoded(base64EncodedCsv, "my sheet", excelRange);
@@ -31,7 +31,7 @@ namespace SheetToObjects.Specs.Adapters
             var excelFileBytes = File.ReadAllBytes(TwoColumnsTwoRowsWithHeadersFilePath);
             var excelFilebase64Encoded = Convert.ToBase64String(excelFileBytes); ;
 
-            var provider = new SheetProvider(new ExcelAdapter());
+            var provider = new SheetProvider(new MicrosoftExcelToSheetConverter());
             var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", 3));
 
             var excelData = provider.GetFromBase64Encoded(excelFilebase64Encoded, "my sheet", excelRange);
@@ -43,7 +43,7 @@ namespace SheetToObjects.Specs.Adapters
         [Fact]
         public void GivenNonExistentPath_WhenLoadingExcelData_ItThrows()
         {
-            var provider = new SheetProvider(new ExcelAdapter());
+            var provider = new SheetProvider(new MicrosoftExcelToSheetConverter());
             var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", 3));
 
             Action result = () => provider.GetFromPath(@"/some/non/existing/file", "my sheet", excelRange);
@@ -54,7 +54,7 @@ namespace SheetToObjects.Specs.Adapters
         [Fact]
         public void GivenExcelFileOnDisk_WhenLoadingExcelData_SheetContainsData()
         {
-            var provider = new SheetProvider(new ExcelAdapter());
+            var provider = new SheetProvider(new MicrosoftExcelToSheetConverter());
             var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", 3));
 
             var sheet = provider.GetFromPath(TwoColumnsTwoRowsWithHeadersFilePath, "my sheet", excelRange);
@@ -66,22 +66,18 @@ namespace SheetToObjects.Specs.Adapters
         [Fact]
         public void GivenAStream_WhenLoadingCsvData_SheetContainsData()
         {
-            using (var fileStream = new FileStream(TwoColumnsTwoRowsWithHeadersFilePath, FileMode.Open))
-            {
-                using (var sr = new StreamReader(fileStream, Encoding.UTF8, false, 1024, true))
-                {
-                    var provider = new SheetProvider(new ExcelAdapter());
-                    var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", 3));
+            using var fileStream = new FileStream(TwoColumnsTwoRowsWithHeadersFilePath, FileMode.Open);
+            using var sr = new StreamReader(fileStream, Encoding.UTF8, false, 1024, true);
+            var provider = new SheetProvider(new MicrosoftExcelToSheetConverter());
+            var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", 3));
 
-                    var csvData = provider.GetFromStream(sr.BaseStream, "my sheet", excelRange);
+            var csvData = provider.GetFromStream(sr.BaseStream, "my sheet", excelRange);
 
-                    csvData.Rows.Count.Should().Be(3);
-                    csvData.Rows.First().Cells.Count.Should().Be(2);
-                }
-            }
+            csvData.Rows.Count.Should().Be(3);
+            csvData.Rows.First().Cells.Count.Should().Be(2);
         }
 
-        [Theory]        
+        [Theory]
         [InlineData(true, 3)]
         [InlineData(false, 1048576)]
 
@@ -89,19 +85,15 @@ namespace SheetToObjects.Specs.Adapters
         {
             int max_number_of_excel_rows = 1048576;
 
-            using (var fileStream = new FileStream(TwoColumnsTwoRowsWithHeadersFilePath, FileMode.Open))
-            {
-                using (var sr = new StreamReader(fileStream, Encoding.UTF8, false, 1024, true))
-                {
-                    var provider = new SheetProvider(new ExcelAdapter());
-                    var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", max_number_of_excel_rows));
+            using var fileStream = new FileStream(TwoColumnsTwoRowsWithHeadersFilePath, FileMode.Open);
+            using var sr = new StreamReader(fileStream, Encoding.UTF8, false, 1024, true);
+            var provider = new SheetProvider(new MicrosoftExcelToSheetConverter());
+            var excelRange = new ExcelRange(new ExcelCell("A", 1), new ExcelCell("B", max_number_of_excel_rows));
 
-                    var csvData = provider.GetFromStream(sr.BaseStream, "my sheet", excelRange, stopOnEmptyRow);
+            var csvData = provider.GetFromStream(sr.BaseStream, "my sheet", excelRange, stopOnEmptyRow);
 
-                    csvData.Rows.Count.Should().Be(expectedCount);
-                    csvData.Rows.First().Cells.Count.Should().Be(2);
-                }
-            }
+            csvData.Rows.Count.Should().Be(expectedCount);
+            csvData.Rows.First().Cells.Count.Should().Be(2);
         }
     }
 }

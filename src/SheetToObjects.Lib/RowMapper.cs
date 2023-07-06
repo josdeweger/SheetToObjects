@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SheetToObjects.Core;
 using SheetToObjects.Lib.FluentConfiguration;
 using SheetToObjects.Lib.Validation;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace SheetToObjects.Lib
 {
@@ -31,14 +31,14 @@ namespace SheetToObjects.Lib
 
             if (rowValidationErrors.Any())
                 return Result.Failure<ParsedModel<T>, List<IValidationError>>(rowValidationErrors);
-            
+
             return Result.Success<ParsedModel<T>, List<IValidationError>>(new ParsedModel<T>(obj, row.RowIndex));
         }
 
         private IEnumerable<IValidationError> MapRow<TModel>(
-            Row row, 
-            MappingConfig mappingConfig, 
-            PropertyInfo property, 
+            Row row,
+            MappingConfig mappingConfig,
+            PropertyInfo property,
             TModel obj) where TModel : new()
         {
             var columnMapping = mappingConfig.GetColumnMappingByPropertyName(property.Name);

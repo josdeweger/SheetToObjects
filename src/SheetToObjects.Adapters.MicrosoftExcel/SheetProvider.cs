@@ -1,9 +1,10 @@
-﻿using System;
+﻿using OfficeOpenXml;
+using SheetToObjects.Lib;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using OfficeOpenXml;
-using SheetToObjects.Lib;
+using System.Reflection;
 
 namespace SheetToObjects.Adapters.MicrosoftExcel
 {
@@ -11,44 +12,44 @@ namespace SheetToObjects.Adapters.MicrosoftExcel
     {
         private readonly IConvertDataToSheet<ExcelData> _excelDataConverter;
 
+        static SheetProvider()
+        {
+            FieldInfo licenseField = typeof(ExcelPackage).GetField("_licenseSet", BindingFlags.NonPublic | BindingFlags.Static)!;
+            licenseField.SetValue(null, true);
+        }
+
         internal SheetProvider(IConvertDataToSheet<ExcelData> excelDataConverter)
         {
             _excelDataConverter = excelDataConverter;
         }
 
-        public SheetProvider() : this(new ExcelAdapter()) { }
+        public SheetProvider() : this(new MicrosoftExcelToSheetConverter()) { }
 
         public Sheet GetFromBase64Encoded(string base64EncodedFile, string sheetName, ExcelRange range, bool stopReadingOnEmptyRow = false)
         {
             var fileBytes = Convert.FromBase64String(base64EncodedFile);
 
-            using (var fileStream = new MemoryStream(fileBytes))
-            {
-                return GetFromStream(fileStream, sheetName, range, stopReadingOnEmptyRow);
-            }
+            using var fileStream = new MemoryStream(fileBytes);
+            return GetFromStream(fileStream, sheetName, range, stopReadingOnEmptyRow);
         }
 
         public Sheet GetFromPath(string excelPath, string sheetName, ExcelRange range, bool stopReadingOnEmptyRow = false)
         {
-            using (var fileStream = new FileStream(excelPath, FileMode.Open))
-            {
-                return GetFromStream(fileStream, sheetName, range, stopReadingOnEmptyRow);
-            }
+            using var fileStream = new FileStream(excelPath, FileMode.Open);
+            return GetFromStream(fileStream, sheetName, range, stopReadingOnEmptyRow);
         }
 
         public Sheet GetFromStream(Stream fileStream, string sheetName, ExcelRange range, bool stopReadingOnEmptyRow = false)
         {
-            using (var excelPackage = new ExcelPackage(fileStream))
-            {
-                var workBook = excelPackage.Workbook;
-                var workSheet = GetSheetFromWorkBook(workBook, sheetName);
+            using var excelPackage = new ExcelPackage(fileStream);
+            var workBook = excelPackage.Workbook;
+            var workSheet = GetSheetFromWorkBook(workBook, sheetName);
 
-                var data = CreateDataForRange(workSheet, range, stopReadingOnEmptyRow);
+            var data = CreateDataForRange(workSheet, range, stopReadingOnEmptyRow);
 
-                var excelData = new ExcelData { Values = data };
+            var excelData = new ExcelData { Values = data };
 
-                return _excelDataConverter.Convert(excelData);
-            }
+            return _excelDataConverter.Convert(excelData);
         }
 
         private static List<List<string>> CreateDataForRange(ExcelWorksheet workSheet, ExcelRange range, bool stopReadingOnEmptyRow)
@@ -64,7 +65,7 @@ namespace SheetToObjects.Adapters.MicrosoftExcel
                     row.Add(workSheet.Cells[rowNumber, columnNumber].Text);
                 }
 
-                if (stopReadingOnEmptyRow && row.All(x => string.IsNullOrEmpty(x)))
+                if (stopReadingOnEmptyRow && row.All(string.IsNullOrEmpty))
                     return data;
 
                 data.Add(row);
@@ -77,7 +78,7 @@ namespace SheetToObjects.Adapters.MicrosoftExcel
         {
             var normalizedSheetName = sheetName.Replace(" ", "").ToLowerInvariant();
 
-            for (var i = 1; i <= excelWorkbook.Worksheets.Count; i++)
+            for (var i = 0; i < excelWorkbook.Worksheets.Count; i++)
             {
                 if (excelWorkbook.Worksheets[i].Name.Replace(" ", "").ToLowerInvariant().Equals(normalizedSheetName))
                 {

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
 using SheetToObjects.Core;
 using SheetToObjects.Lib.FluentConfiguration;
 using SheetToObjects.Lib.Parsing;
 using SheetToObjects.Lib.Validation;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SheetToObjects.Lib
 {
@@ -91,6 +91,21 @@ namespace SheetToObjects.Lib
             );
         }
 
+        public MappingRowResult<T> MapRow<T>(Row row)
+            where T : new()
+        {
+            var mappingConfig = GetMappingConfig<T>();
+
+            ParsedModel<T>? parsedModel = null;
+            List<IValidationError> validationErrors = new();
+
+            _rowMapper.Map<T>(row, mappingConfig)
+                    .Tap(result => parsedModel = result)
+                    .TapError(rowValidationErrors => validationErrors = rowValidationErrors);
+
+            return MappingRowResult<T>.Create(parsedModel, validationErrors);
+        }
+
         private void MapRows<T>(Sheet sheet, MappingConfig mappingConfig, List<ParsedModel<T>> parsedModels, List<IValidationError> validationErrors)
             where T : new()
         {
@@ -98,16 +113,16 @@ namespace SheetToObjects.Lib
 
             if (mappingConfig.StopParsingAtFirstEmptyRow)
                 dataRows = FilterAfterFirstEmptyRow<T>(dataRows);
-            
+
             dataRows.ForEach(row =>
             {
                 _rowMapper.Map<T>(row, mappingConfig)
                     .Tap(result => parsedModels.Add(result))
-                    .OnFailure(rowValidationErrors => validationErrors.AddRange(rowValidationErrors));
+                    .TapError(rowValidationErrors => validationErrors.AddRange(rowValidationErrors));
             });
         }
 
-        private static List<Row> FilterAfterFirstEmptyRow<T>(List<Row> dataRows) 
+        private static List<Row> FilterAfterFirstEmptyRow<T>(List<Row> dataRows)
             where T : new()
         {
             var firstEmptyRow = dataRows
@@ -151,7 +166,7 @@ namespace SheetToObjects.Lib
                 }
                 else if (columnMapping.IsRequiredInHeaderRow)
                 {
-                    validationErrors.Add(ParsingValidationError.CouldNotFindHeader(-1, 0,columnMapping.ColumnName, columnMapping.ColumnName));
+                    validationErrors.Add(ParsingValidationError.CouldNotFindHeader(-1, 0, columnMapping.ColumnName, columnMapping.ColumnName));
                 }
 
             }

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Summary>Extension to SheetToObjects (Sheet to object mapper for Google Sheets, Excel, csv), which makes it easy to add SheetToObjects to the Microsoft.Extensions.DependencyInjection services collection.</Summary>    
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SheetToObjects.Lib\SheetToObjects.Lib.csproj" />

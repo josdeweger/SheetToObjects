@@ -2,7 +2,7 @@
   <Import Project="../Common.props" />
   <PropertyGroup>
     <Summary>Protected Google Sheets adapter for the SheetToObjects library.</Summary>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 

@@ -1,5 +1,6 @@
-﻿using System;
-using CSharpFunctionalExtensions;
+﻿using CSharpFunctionalExtensions;
+using System;
+using System.Globalization;
 
 namespace SheetToObjects.Lib.Parsing
 {
@@ -16,7 +17,18 @@ namespace SheetToObjects.Lib.Parsing
         {
             try
             {
-                var parsedValue = Convert.ChangeType(value, _type);
+                object? parsedValue = null;
+
+                if (_type == typeof(double) || _type == typeof(decimal) || _type == typeof(double?) || _type == typeof(decimal?))
+                {
+                    value = value.Replace(',', '.');
+                    parsedValue = Convert.ChangeType(value, _type, CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    parsedValue = Convert.ChangeType(value, _type);
+                }
+
                 return Result.Success<object, string>(parsedValue);
             }
             catch (Exception)

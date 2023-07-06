@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SheetToObjects.Core;
+using SheetToObjects.Lib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SheetToObjects.Core;
-using SheetToObjects.Lib;
 
 namespace SheetToObjects.Adapters.Csv
 {
@@ -10,7 +10,7 @@ namespace SheetToObjects.Adapters.Csv
     {
         public Sheet Convert(CsvData csvData)
         {
-            if(csvData.IsNull())
+            if (csvData.IsNull())
                 throw new ArgumentException(nameof(csvData));
 
             if (!csvData.Values.Any())
@@ -20,7 +20,5 @@ namespace SheetToObjects.Adapters.Csv
 
             return new Sheet(cells);
         }
-
-
     }
 }

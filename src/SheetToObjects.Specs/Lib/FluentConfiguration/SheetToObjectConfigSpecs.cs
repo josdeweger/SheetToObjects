@@ -1,9 +1,9 @@
-﻿using System;
-using System.Globalization;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SheetToObjects.Lib;
 using SheetToObjects.Lib.FluentConfiguration;
 using SheetToObjects.Specs.Builders;
+using System;
+using System.Globalization;
 using Xunit;
 
 namespace SheetToObjects.Specs.Lib.FluentConfiguration

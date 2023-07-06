@@ -1,5 +1,5 @@
-﻿using System;
-using SheetToObjects.Lib.FluentConfiguration;
+﻿using SheetToObjects.Lib.FluentConfiguration;
+using System;
 
 namespace SheetToObjects.Lib
 {
@@ -9,5 +9,6 @@ namespace SheetToObjects.Lib
             where T : new();
 
         MappingResult<T> Map<T>(Sheet sheet) where T : new();
+        MappingRowResult<T> MapRow<T>(Row row) where T : new();
     }
 }

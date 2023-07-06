@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Summary>CSV adapter for the SheetToObjects library.</Summary>    
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-	<TargetFramework>netstandard2.1</TargetFramework>
+	<TargetFramework>net7.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\SheetToObjects.Core\SheetToObjects.Core.csproj" />

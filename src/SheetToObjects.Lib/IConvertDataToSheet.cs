@@ -4,4 +4,9 @@ namespace SheetToObjects.Lib
     {
         Sheet Convert(TData sheetData);
     }
+
+    public interface IConvertDataToRow<in TData>
+    {
+        Row ConvertRow(TData rowData, int rowIndex);
+    }
 }

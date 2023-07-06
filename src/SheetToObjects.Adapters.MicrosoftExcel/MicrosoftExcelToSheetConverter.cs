@@ -1,16 +1,16 @@
-﻿using System;
+﻿using SheetToObjects.Core;
+using SheetToObjects.Lib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SheetToObjects.Core;
-using SheetToObjects.Lib;
 
 namespace SheetToObjects.Adapters.MicrosoftExcel
 {
-    internal class ExcelAdapter : IConvertDataToSheet<ExcelData>
+    internal class MicrosoftExcelToSheetConverter : IConvertDataToSheet<ExcelData>
     {
         public Sheet Convert(ExcelData excelData)
         {
-            if(excelData.IsNull())
+            if (excelData.IsNull())
                 throw new ArgumentException(nameof(excelData));
 
             if (!excelData.Values.Any())
@@ -20,7 +20,5 @@ namespace SheetToObjects.Adapters.MicrosoftExcel
 
             return new Sheet(cells);
         }
-
-
     }
 }
