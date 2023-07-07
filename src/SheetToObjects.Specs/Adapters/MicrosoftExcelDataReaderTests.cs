@@ -24,7 +24,7 @@ public class MicrosoftExcelDataReaderTests
         var mapConfig = new TestModelMap();
 
         var excelRange = new ExcelRange(new ExcelCell("A", 2), new ExcelCell("J", max_number_of_excel_rows));
-        MicrosoftExcelDataReader<TestModel> dataReader = MicrosoftExcelDataReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: false);
+        MicrosoftExcelSheetReader<TestModel> dataReader = MicrosoftExcelSheetReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: false);
 
         var list = dataReader.ToList();
 
@@ -43,7 +43,7 @@ public class MicrosoftExcelDataReaderTests
         var mapConfig = new TestModelMap();
 
         var excelRange = new ExcelRange(new ExcelCell("A", 2), new ExcelCell("J", max_number_of_excel_rows));
-        MicrosoftExcelDataReader<TestModel> dataReader = MicrosoftExcelDataReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
+        MicrosoftExcelSheetReader<TestModel> dataReader = MicrosoftExcelSheetReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
 
         var list = dataReader.ToList();
 
@@ -62,7 +62,7 @@ public class MicrosoftExcelDataReaderTests
         var mapConfig = new TestModelMap();
 
         var excelRange = new ExcelRange(new ExcelCell("A", 3), new ExcelCell("J", max_number_of_excel_rows));
-        MicrosoftExcelDataReader<TestModel> dataReader = MicrosoftExcelDataReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
+        MicrosoftExcelSheetReader<TestModel> dataReader = MicrosoftExcelSheetReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
 
         var list = dataReader.ToList();
 
@@ -81,9 +81,34 @@ public class MicrosoftExcelDataReaderTests
         var mapConfig = new TestModelMap();
 
         var excelRange = new ExcelRange(new ExcelCell("A", 2), new ExcelCell("J", max_number_of_excel_rows));
-        using var dataReader = MicrosoftExcelDataReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
+        using var dataReader = MicrosoftExcelSheetReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
 
         dataReader.Worksheet.Cells[2, 2].Value = 55;
+
+        dataReader.ExcelPackage.SaveAsAsync(@"./TestFiles/TestModel2.xlsx");
+    }
+
+    [Fact]
+    public void TestSave()
+    {
+        int max_number_of_excel_rows = 5;
+
+        using var fileStream = new FileStream(TestModelFilePath, FileMode.Open);
+
+        var mapConfig = new TestModelMap();
+
+        var excelRange = new ExcelRange(new ExcelCell("A", 2), new ExcelCell("J", max_number_of_excel_rows));
+        using var dataReader = MicrosoftExcelSheetReader<TestModel>.CreateReader(fileStream, "sheet1", excelRange, mapConfig, stopReadingOnEmptyRow: true);
+
+        foreach (var obj in dataReader)
+        {
+            TestModel testModel = obj.MappingRowResult.ParsedModel!.Value;
+            testModel.StringProperty = testModel.StringProperty + " новое значение";
+            testModel.IntProperty = testModel.IntProperty + 500;
+
+            int rowNumber = obj.ExcelRow.Row;
+            dataReader.SetValue(rowNumber, testModel);
+        }
 
         dataReader.ExcelPackage.SaveAsAsync(@"./TestFiles/TestModel2.xlsx");
     }

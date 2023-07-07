@@ -2,44 +2,54 @@
 using SheetToObjects.Core;
 using SheetToObjects.Lib.FluentConfiguration;
 using SheetToObjects.Lib.Validation;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SheetToObjects.Lib
+namespace SheetToObjects.Lib.SetValues
 {
-    internal class RowSetter : IMapRow
+    public class RowSetter : IRowSetter
     {
-        private readonly IMapValue _valueMapper;
+        private readonly IRawExcelService _rawExcelService;
 
-        public RowSetter(IMapValue valueMapper)
+        public RowSetter(IRawExcelService rawExcelService)
         {
-            _valueMapper = valueMapper;
+            _rawExcelService = rawExcelService;
         }
 
-        public Result<ParsedModel<T>, List<IValidationError>> Map<T>(Row row, MappingConfig mappingConfig)
+        public Maybe<List<IValidationError>> SetProperties<T>(Row row, T previousObj, T obj, MappingConfig mappingConfig)
             where T : new()
         {
             var rowValidationErrors = new List<IValidationError>();
-            var obj = new T();
             var properties = obj.GetType().GetProperties().ToList();
 
             properties.ForEach(property =>
             {
-                rowValidationErrors.AddRange(MapRow(row, mappingConfig, property, obj));
+                object? previousPropertyValue = property.GetValue(previousObj);
+                object? currentPropertyValue = property.GetValue(obj);
+
+                if (previousPropertyValue == null && currentPropertyValue == null)
+                    return;
+
+                bool equals = previousPropertyValue?.Equals(currentPropertyValue) ?? false;
+                if (equals)
+                    return;
+
+                rowValidationErrors.AddRange(SetPropertyValue(row, mappingConfig, obj, property));
             });
 
             if (rowValidationErrors.Any())
-                return Result.Failure<ParsedModel<T>, List<IValidationError>>(rowValidationErrors);
+                return Maybe<List<IValidationError>>.From(rowValidationErrors);
 
-            return Result.Success<ParsedModel<T>, List<IValidationError>>(new ParsedModel<T>(obj, row.RowIndex));
+            return Maybe<List<IValidationError>>.None;
         }
 
-        private IEnumerable<IValidationError> MapRow<TModel>(
+        private IEnumerable<IValidationError> SetPropertyValue(
             Row row,
             MappingConfig mappingConfig,
-            PropertyInfo property,
-            TModel obj) where TModel : new()
+            object obj,
+            PropertyInfo property)
         {
             ColumnMapping? columnMapping = mappingConfig.GetColumnMappingByPropertyName(property.Name);
 
@@ -56,18 +66,10 @@ namespace SheetToObjects.Lib
                     .GetValueOrDefault();
             }
 
-            var validationErrors = new List<IValidationError>();
+            object? propertyValue = property.GetValue(obj);
 
-            _valueMapper
-                .Map(cell.Value.ToString(), property.PropertyType, row.RowIndex, columnMapping)
-                .Tap(value =>
-                {
-                    if (value.ToString().IsNotNullOrEmpty())
-                        property.SetValue(obj, value);
-                })
-                .OnFailure(validationErrors.Add);
-
-            return validationErrors;
+            _rawExcelService.SetPropertyValue(cell, propertyValue);
+            return Array.Empty<IValidationError>();
         }
 
         private static Maybe<IValidationError> HandleEmptyCell(ColumnMapping columnMapping, int rowIndex, string propertyName)

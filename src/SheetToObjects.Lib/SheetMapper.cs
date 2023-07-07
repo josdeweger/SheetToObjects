@@ -14,7 +14,7 @@ namespace SheetToObjects.Lib
     {
         private readonly IMapRow _rowMapper;
         private readonly IValidateModels _modelValidator;
-        private readonly ConcurrentDictionary<Type, MappingConfig> _mappingConfigs = new ConcurrentDictionary<Type, MappingConfig>();
+        private readonly ConcurrentDictionary<Type, MappingConfig> _mappingConfigs = new();
 
         private SheetMapper(IMapRow rowMapper, IValidateModels modelValidator)
         {
