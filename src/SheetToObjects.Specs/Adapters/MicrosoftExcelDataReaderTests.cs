@@ -2,8 +2,11 @@
 using SheetToObjects.Adapters.MicrosoftExcel;
 using SheetToObjects.Specs.SheetToObjectConfigs;
 using SheetToObjects.Specs.TestModels;
+using System;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Text;
 using Xunit;
 
@@ -107,10 +110,30 @@ public class MicrosoftExcelDataReaderTests
             testModel.IntProperty = testModel.IntProperty + 500;
 
             int rowNumber = obj.ExcelRow.Row;
-            dataReader.SetValue(rowNumber, testModel);
+            dataReader.SetValue(testModel, rowNumber);
         }
 
         dataReader.ExcelPackage.SaveAsAsync(@"./TestFiles/TestModel2.xlsx");
+    }
+
+    [Fact]
+    public void PropertyExpression()
+    {
+        TestModel model = new TestModel()
+        {
+            IntProperty = 1,
+        };
+
+        Expression<Func<TestModel, int>> exp = o => o.IntProperty;
+
+        ParameterExpression parameterExpr = Expression.Parameter(typeof(TestModel), "o");
+        PropertyInfo propertyInfo = typeof(TestModel).GetProperty("IntProperty")!;
+        MemberExpression memberExpression = Expression.Property(parameterExpr, propertyInfo);
+        LambdaExpression lambdaExpression = Expression.Lambda(memberExpression, parameterExpr);
+
+        var @delegate = lambdaExpression.Compile();
+        var type = @delegate.GetType();
+        int result = (int)@delegate.Method.Invoke(model, null);
     }
 }
 
