@@ -5,17 +5,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace SheetToObjects.Adapters.MicrosoftExcel.ServiceCollectionExt;
+namespace SheetToObjects.Adapters.MicrosoftExcel.Extensions;
 internal class MicrosoftExcelSheetMapConfigBuilder
 {
     private readonly IConfiguration _configuration;
     private readonly MicrosoftExcelConfigurationReaderOptions _options;
+    private readonly Assembly[] _assemblies;
 
-    public MicrosoftExcelSheetMapConfigBuilder(IConfiguration configuration,
+    public MicrosoftExcelSheetMapConfigBuilder(
+        IConfiguration configuration,
+        IEnumerable<Assembly> assemblies,
         MicrosoftExcelConfigurationReaderOptions options)
     {
         _configuration = configuration;
         _options = options;
+        _assemblies = assemblies as Assembly[] ?? assemblies.ToArray();
     }
 
     public MicrosoftExcelSheetMapConfig Build(IConfigurationSection section)
@@ -23,7 +27,7 @@ internal class MicrosoftExcelSheetMapConfigBuilder
         MicrosoftExcelSheetMapConfig sheetMapConfig = new();
 
         string sheetModel = section.Key;
-        Type sheetModelType = GetSheetModelType(_options.Assemblies, sheetModel);
+        Type sheetModelType = GetSheetModelType(sheetModel);
 
         var configReaderType = typeof(MicrosoftExcelConfigurationReader<>).MakeGenericType(sheetModelType);
         object[] constructorParams = new object[]
@@ -48,10 +52,10 @@ internal class MicrosoftExcelSheetMapConfigBuilder
         return sheetMapConfig;
     }
 
-    private static Type GetSheetModelType(Assembly[] assemblies, string name)
+    private Type GetSheetModelType(string name)
     {
         List<Type> types = new();
-        foreach (Assembly assembly in assemblies)
+        foreach (Assembly assembly in _assemblies)
             foreach (Type type in assembly.GetTypes())
             {
                 if (type.Name != name)

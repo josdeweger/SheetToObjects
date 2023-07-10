@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using SheetToObjects.Adapters.MicrosoftExcel.Configurations;
-using SheetToObjects.Adapters.MicrosoftExcel.ServiceCollectionExt;
+using SheetToObjects.Adapters.MicrosoftExcel.Extensions;
 using SheetToObjects.ConfigurationTests.Support;
 using SheetToObjects.ConfigurationTests.TestModels;
+using System.Reflection;
 using Xunit;
 
 namespace SheetToObjects.ConfigurationTests.Settings.Configuration;
@@ -79,7 +81,6 @@ public class MicrosoftExcelConfigurationReaderTests
 }
 """;
 
-
         IConfigurationRoot root = new ConfigurationBuilder()
             .Add(new JsonStringConfigSource(json))
             .Build();
@@ -92,12 +93,13 @@ public class MicrosoftExcelConfigurationReaderTests
 
         services.AddMicrosoftExcelSheetMapConfigs(root, configure =>
         {
-            configure.Assemblies
+            configure.Assemblies = new Assembly[] { Assembly.GetExecutingAssembly() };
         });
 
-        var section = JsonStringConfigSource.LoadSection(json, "SheetToObjects:MicrosoftExcel:TestModel");
-        var reader = new MicrosoftExcelConfigurationReader<TestModel>(section, new MicrosoftExcelConfigurationReaderOptions(), section);
-        //reader.Configure(config);
+        using var serviceProvider = services.BuildServiceProvider();
+        var optionsMonitor = serviceProvider.GetRequiredService<IOptionsMonitor<MicrosoftExcelSheetMapConfig>>();
+
+        MicrosoftExcelSheetMapConfig mapConfig = optionsMonitor.Get("TestModel");
     }
 
     [Fact]
