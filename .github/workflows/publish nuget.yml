@@ -6,6 +6,9 @@ on:
 
 jobs:
   nuget:
+    env:
+        SOLUTION: 'SheetToObjects.sln'
+
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' }}
     steps:        
@@ -15,9 +18,9 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore $SOLUTION
     - name: Build
-      run: dotnet build --no-restore --configuration Release
+      run: dotnet build $SOLUTION --no-restore --configuration Release
     - name: Pack Rc
       run: dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }}-rc -o \nupkgrc
       if: github.ref == 'refs/heads/develop'

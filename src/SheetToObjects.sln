@@ -41,7 +41,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{3D2390
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflow", "Workflow", "{772AD798-5582-4B0C-AD6C-D8154ACEABA9}"
 	ProjectSection(SolutionItems) = preProject
-		..\.github\workflows\publish-nuget-package.yml = ..\.github\workflows\publish-nuget-package.yml
+		..\.github\workflows\publish nuget.yml = ..\.github\workflows\publish nuget.yml
 	EndProjectSection
 EndProject
 Global
