@@ -1,0 +1,33 @@
+name: Publish Nuget
+
+on:
+  push:
+    branches: [ master, develop ]
+
+jobs:
+  nuget:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'pull_request' }}
+    steps:        
+    - uses: actions/checkout@v3
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+    - name: Pack Rc
+      run: dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }}-rc -o \nupkgrc
+      if: github.ref == 'refs/heads/develop'
+    - name: Pack
+      run: dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }} -o \nupkg
+      if: github.ref == 'refs/heads/master'
+    - name: Push RC
+      run: dotnet nuget push \nupkgrc/*.nupkg -k ${{ secrets.LOCAL_NUGET_KEY }} -s https://nuget.bn-it.ru/v3/index.json
+      if: github.ref == 'refs/heads/develop'
+    - name: Push
+      run: dotnet nuget push \nupkg/*.nupkg -k ${{ secrets.LOCAL_NUGET_KEY }} -s https://nuget.bn-it.ru/v3/index.json
+      if: github.ref == 'refs/heads/master'
+

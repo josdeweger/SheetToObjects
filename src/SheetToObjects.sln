@@ -29,13 +29,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SheetToObjects.Examples", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SheetToObjects.Configuration", "SheetToObjects.Configuration\SheetToObjects.Configuration.csproj", "{1FFD2BE0-DCEA-4E2B-A2EB-AD5A776F74F7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SheetToObjects.ConfigurationTests", "SheetToObjects.ConfigurationTests\SheetToObjects.ConfigurationTests.csproj", "{D1C46C8D-EAA1-4532-9FE6-75287C989E4A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SheetToObjects.ConfigurationTests", "SheetToObjects.ConfigurationTests\SheetToObjects.ConfigurationTests.csproj", "{D1C46C8D-EAA1-4532-9FE6-75287C989E4A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{8CD4A1C9-9E4A-4FA7-8692-D928487C466C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DDBEB197-6B96-47F7-ACEF-22C781F79D6E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3FD83A16-7330-47EB-B9D9-C30845C2811C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github", "Github", "{3D2390D2-58EB-40FC-B770-05DB483DD7F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workflow", "Workflow", "{772AD798-5582-4B0C-AD6C-D8154ACEABA9}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\publish-nuget-package.yml = ..\.github\workflows\publish-nuget-package.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -103,6 +110,8 @@ Global
 		{9C87BF5C-C3C6-490A-BCC2-C1C6FE1340AB} = {3FD83A16-7330-47EB-B9D9-C30845C2811C}
 		{1FFD2BE0-DCEA-4E2B-A2EB-AD5A776F74F7} = {DDBEB197-6B96-47F7-ACEF-22C781F79D6E}
 		{D1C46C8D-EAA1-4532-9FE6-75287C989E4A} = {8CD4A1C9-9E4A-4FA7-8692-D928487C466C}
+		{3D2390D2-58EB-40FC-B770-05DB483DD7F6} = {1634F6CF-74F3-4757-A5CB-ECAB800FCA75}
+		{772AD798-5582-4B0C-AD6C-D8154ACEABA9} = {3D2390D2-58EB-40FC-B770-05DB483DD7F6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {81AF46D8-11F7-4744-AAA2-CE129D2DE0A4}
