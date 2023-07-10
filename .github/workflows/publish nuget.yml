@@ -7,7 +7,7 @@ on:
 jobs:
   nuget:
     env:
-        SOLUTION: 'SheetToObjects.sln'
+        SOLUTION: 'src/SheetToObjects.sln'
 
     runs-on: ubuntu-latest
     if: ${{ github.event_name != 'pull_request' }}
