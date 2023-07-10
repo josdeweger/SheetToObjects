@@ -22,10 +22,10 @@ jobs:
     - name: Build
       run: dotnet build $SOLUTION --no-restore --configuration Release
     - name: Pack Rc
-      run: dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }}-rc -o \nupkgrc
+      run: dotnet pack $SOLUTION -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }}-rc -o \nupkgrc
       if: github.ref == 'refs/heads/develop'
     - name: Pack
-      run: dotnet pack -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }} -o \nupkg
+      run: dotnet pack $SOLUTION -c Release -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:VersionPrefix=${{ github.run_number }} -o \nupkg
       if: github.ref == 'refs/heads/master'
     - name: Push RC
       run: dotnet nuget push \nupkgrc/*.nupkg -k ${{ secrets.LOCAL_NUGET_KEY }} -s https://nuget.bn-it.ru/v3/index.json
